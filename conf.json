@@ -1,0 +1,5 @@
+{
+  "START_URLS": ["https://github.com/Ira11111"],
+  "MAX_DEPTH": 2,
+  "OUTPUT_PATH":"result.txt"
+}

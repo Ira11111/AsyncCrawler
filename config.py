@@ -1,4 +1,3 @@
-import os
 import json
 
 with open('conf.json', 'rb') as file:

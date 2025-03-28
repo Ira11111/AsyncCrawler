@@ -6,12 +6,10 @@ from pathlib import Path
 from urllib.parse import urlparse
 from config import MAX_DEPTH, START_URLS, OUTPUT_PATH
 
-MY_URL = "https://skillbox.ru/"
-BASE_DOMAIN = urlparse(MY_URL).netloc
-
 OUT_PATH = Path(__name__).parent / os.path.dirname(OUTPUT_PATH)
 OUT_PATH.mkdir(exist_ok=True, parents=True)
 OUT_PATH = OUT_PATH.absolute()
+BASE_DOMAINS = set()
 
 
 async def get_content(url, client):
@@ -40,7 +38,7 @@ def is_external_link(url):
     parsed_url = urlparse(url)
     if not parsed_url.netloc:
         return False
-    return parsed_url.netloc != BASE_DOMAIN
+    return parsed_url.netloc not in BASE_DOMAINS
 
 
 def find_links(soup: bs4.BeautifulSoup):
@@ -79,5 +77,10 @@ async def main(url):
 
 async def start_crawl():
     """Дожидаемся корутин для всех ссылок"""
-    tasks = [main(url) for url in START_URLS]
+    global BASE_DOMAINS
+    tasks = []
+    for url in START_URLS:
+        BASE_DOMAINS.add(urlparse(url).netloc)
+        tasks.append(main(url))
+
     await asyncio.gather(*tasks)
